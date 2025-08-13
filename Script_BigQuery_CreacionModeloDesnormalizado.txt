@@ -1,0 +1,38 @@
+CREATE OR REPLACE TABLE pe_staging_jjara.olap_table AS
+SELECT
+  o.orderNumber,
+  o.orderDate,
+  o.requiredDate,
+  o.shippedDate,
+  o.status,
+  c.customerNumber,
+  c.customerName,
+  c.country AS customerCountry,
+  e.employeeNumber AS salesRepEmployeeNumber,
+  e.firstName AS salesRepFirstName,
+  e.lastName AS salesRepLastName,
+  off.officeCode,
+  off.city AS officeCity,
+  od.productCode,
+  p.productName,
+  pl.productLine,
+  od.quantityOrdered,
+  od.priceEach,
+  od.quantityOrdered * od.priceEach AS lineTotal,
+  pay.paymentDate,
+  pay.amount AS paymentAmount
+FROM pe_od_raw_jjara.orders_raw o
+LEFT JOIN pe_od_raw_jjara.customers_raw c
+  ON o.customerNumber = c.customerNumber
+LEFT JOIN pe_od_raw_jjara.employees_raw e
+  ON c.salesRepEmployeeNumber = e.employeeNumber
+LEFT JOIN pe_od_raw_jjara.offices_raw off
+  ON e.officeCode = off.officeCode
+LEFT JOIN pe_od_raw_jjara.orderdetails_raw od
+  ON o.orderNumber = CAST(od.orderNumber AS INT64)
+LEFT JOIN pe_od_raw_jjara.products_raw p
+  ON od.productCode = p.productCode
+LEFT JOIN pe_od_raw_jjara.productlines_raw pl
+  ON p.productLine = pl.productLine
+LEFT JOIN pe_od_raw_jjara.payments_raw pay
+  ON o.customerNumber = pay.customerNumber;

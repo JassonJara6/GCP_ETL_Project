@@ -1,0 +1,58 @@
+from flask import Flask
+import mysql.connector
+from google.cloud import storage
+import pandas as pd
+
+app = Flask(__name__)
+
+# Parámetros fijos
+BUCKET_NAME = "dl_raw_jjara"
+TABLES = ["customers", "employees", "orders", "payments", "products", "productlines", "offices"]
+
+# Conexión a MySQL
+DB_CONFIG = {
+    "host": "34.44.3.118",
+    "user": "dataurp",
+    "password": "Fiis2003$06",
+    "database": "jjara"
+}
+
+def export_table_to_gcs(table_name):
+    """Extrae una tabla de MySQL, la guarda como Parquet en /tmp y la sube a GCS."""
+    # Conexión
+    mydb = mysql.connector.connect(**DB_CONFIG)
+    cursor = mydb.cursor()
+    cursor.execute(f"SELECT * FROM {table_name}")
+    rows = cursor.fetchall()
+    columns = [desc[0] for desc in cursor.description]
+    mydb.close()
+
+    # DataFrame
+    df = pd.DataFrame(rows, columns=columns)
+
+    # Guardar Parquet en formato compatible para BigQuery
+    temp_path = f"/tmp/{table_name}.parquet"
+    df.to_parquet(
+        temp_path,
+        index=False,
+        engine="pyarrow",    # Usa pyarrow para mayor compatibilidad
+        compression="snappy" # Compresión recomendada para BigQuery
+    )
+
+    # Subir a GCS
+    storage_client = storage.Client()
+    bucket = storage_client.bucket(BUCKET_NAME)
+    blob = bucket.blob(f"{table_name}/{table_name}.parquet")  # carpeta por tabla
+    blob.upload_from_filename(temp_path)
+
+    return f"✅ {table_name}.parquet sobrescrito en gs://{BUCKET_NAME}/{table_name}/{table_name}.parquet"
+
+@app.route("/", methods=["GET"])
+def export_all_tables():
+    resultados = []
+    for table in TABLES:
+        try:
+            resultados.append(export_table_to_gcs(table))
+        except Exception as e:
+            resultados.append(f"❌ Error exportando {table}: {str(e)}")
+    return "\n".join(resultados)

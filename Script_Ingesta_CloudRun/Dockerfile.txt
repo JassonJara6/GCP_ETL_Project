@@ -1,0 +1,16 @@
+FROM python:3.9-buster
+
+RUN pip install Flask gunicorn
+RUN pip install numpy
+RUN pip install pandas
+RUN pip install google-cloud
+RUN pip install mysql.connector.python
+RUN pip install google.cloud.storage
+RUN pip install pyarrow
+
+WORKDIR /app
+COPY . .
+
+ENV PORT 8080
+
+CMD exec gunicorn --bind 0.0.0.0:$PORT --workers 1 --threads 8 --timeout 0 app:app

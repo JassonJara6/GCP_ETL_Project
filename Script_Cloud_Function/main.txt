@@ -1,0 +1,22 @@
+from google.cloud import storage
+import functions_framework
+
+# CloudEvent function triggered by Eventarc
+@functions_framework.cloud_event
+def ingestdataentry(cloudevent):
+    # Configuración
+    src_bucket_name = "pe-od-dataentry-jjara"
+    src_blob_name = "orderdetails.csv"
+    dest_bucket_name = "dl_raw_jjara"
+    dest_blob_name = "orderdetails/orderdetails.csv"
+
+    storage_client = storage.Client()
+
+    # Buckets origen y destino
+    source_bucket = storage_client.bucket(src_bucket_name)
+    source_blob = source_bucket.blob(src_blob_name)
+    dest_bucket = storage_client.bucket(dest_bucket_name)
+
+    # Copia directa en GCS
+    source_bucket.copy_blob(source_blob, dest_bucket, dest_blob_name)
+    print(f"✅ Archivo copiado a gs://{dest_bucket_name}/{dest_blob_name}")

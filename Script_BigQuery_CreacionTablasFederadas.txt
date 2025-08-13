@@ -1,0 +1,63 @@
+-- Customers
+
+CREATE OR REPLACE EXTERNAL TABLE pe_od_raw_jjara.customers_raw
+OPTIONS (
+  format = 'PARQUET',
+  uris = ['gs://dl_raw_jjara/customers/*.parquet']
+);
+
+-- Employees
+
+CREATE OR REPLACE EXTERNAL TABLE pe_od_raw_jjara.employees_raw
+OPTIONS (
+  format = 'PARQUET',
+  uris = ['gs://dl_raw_jjara/employees/*.parquet']
+);
+
+-- Offices
+
+CREATE OR REPLACE EXTERNAL TABLE pe_od_raw_jjara.offices_raw
+OPTIONS (
+  format = 'PARQUET',
+  uris = ['gs://dl_raw_jjara/offices/*.parquet']
+);
+
+-- Order Details
+
+CREATE OR REPLACE EXTERNAL TABLE pe_od_raw_jjara.orderdetails_raw
+OPTIONS (
+  format = 'CSV',
+  uris = ['gs://dl_raw_jjara/orderdetails/*.csv']
+);
+
+-- Orders
+
+CREATE OR REPLACE EXTERNAL TABLE pe_od_raw_jjara.orders_raw
+OPTIONS (
+  format = 'PARQUET',
+  uris = ['gs://dl_raw_jjara/orders/*.parquet']
+);
+
+-- Payments
+
+CREATE OR REPLACE EXTERNAL TABLE pe_od_raw_jjara.payments_raw
+OPTIONS (
+  format = 'PARQUET',
+  uris = ['gs://dl_raw_jjara/payments/*.parquet']
+);
+
+-- Products
+
+CREATE OR REPLACE EXTERNAL TABLE pe_od_raw_jjara.products_raw
+OPTIONS (
+  format = 'PARQUET',
+  uris = ['gs://dl_raw_jjara/products/*.parquet']
+);
+
+-- Product Lines
+
+CREATE OR REPLACE EXTERNAL TABLE pe_od_raw_jjara.productlines_raw
+OPTIONS (
+  format = 'PARQUET',
+  uris = ['gs://dl_raw_jjara/productlines/*.parquet']
+);
