@@ -27,7 +27,9 @@ OPTIONS (
 CREATE OR REPLACE EXTERNAL TABLE pe_od_raw_jjara.orderdetails_raw
 OPTIONS (
   format = 'CSV',
-  uris = ['gs://dl_raw_jjara/orderdetails/*.csv']
+  uris = ['gs://dl_raw_jjara/orderdetails/*.csv'],
+  field_delimiter = ';',
+  skip_leading_rows = 1
 );
 
 -- Orders
@@ -61,3 +63,4 @@ OPTIONS (
   format = 'PARQUET',
   uris = ['gs://dl_raw_jjara/productlines/*.parquet']
 );
+
